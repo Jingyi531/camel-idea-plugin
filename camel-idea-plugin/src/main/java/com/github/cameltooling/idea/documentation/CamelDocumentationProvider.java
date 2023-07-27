@@ -415,16 +415,8 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
         return builder.toString();
     }
 
-    private String generateCamelComponentDocumentation(String componentName, String val, int wrapLength, Project project) {
-        // it is a known Camel component
-        CamelCatalog camelCatalog = project.getService(CamelCatalogService.class).get();
-        String json = camelCatalog.componentJSonSchema(componentName);
-        if (json == null) {
-            return null;
-        }
 
-        ComponentModel component = JsonMapper.generateComponentModel(json);
-
+    private String normalizeQuery(String val) {
         // camel catalog expects &amp; as & when it parses so replace all &amp; as &
         String camelQuery = val;
         camelQuery = camelQuery.replaceAll("&amp;", "&");
@@ -433,7 +425,11 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
         if (camelQuery.endsWith("&") || camelQuery.endsWith("?")) {
             camelQuery = camelQuery.substring(0, camelQuery.length() - 1);
         }
+        return camelQuery;
+    }
 
+
+    private void appendExistingOptions(CamelCatalog camelCatalog, String camelQuery, StringBuilder options, int wrapLength, String json) {
         Map<String, String> existing = null;
         try {
             existing = camelCatalog.endpointProperties(camelQuery);
@@ -441,7 +437,6 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
             LOG.warn("Error parsing Camel endpoint properties with url: " + camelQuery, e);
         }
 
-        StringBuilder options = new StringBuilder();
         if (existing != null && !existing.isEmpty()) {
             JsonObject jsonObject;
             try {
@@ -481,6 +476,10 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
             }
         }
 
+    }
+
+
+    private void appendExtraOptions(CamelCatalog camelCatalog, String camelQuery, StringBuilder options, int wrapLength) {
         // append any lenient options as well
         Map<String, String> extra = null;
         try {
@@ -501,7 +500,11 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
                 options.append(wrapText(summary, wrapLength)).append("<br/>");
             }
         }
+    }
 
+
+    private StringBuilder createComponentDocumentation(int wrapLength, String val, String json) {
+        ComponentModel component = JsonMapper.generateComponentModel(json);
         StringBuilder sb = new StringBuilder();
         if (component.isDeprecated()) {
             sb.append("<b><s>").append(component.getTitle()).append(" Component (deprecated)</s></b><br/>");
@@ -529,12 +532,32 @@ public class CamelDocumentationProvider extends DocumentationProviderEx implemen
         // indent the endpoint url with 5 spaces and wrap it by url separator
         String wrapped = wrapSeparator(val, "&", "<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", 100);
         sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>").append(wrapped).append("</b><br/>");
+        return sb;
+    }
+
+    private String generateCamelComponentDocumentation(String componentName, String val, int wrapLength, Project project) {
+        // it is a known Camel component
+        CamelCatalog camelCatalog = project.getService(CamelCatalogService.class).get();
+        String json = camelCatalog.componentJSonSchema(componentName);
+        if (json == null) {
+            return null;
+        }
+
+        // get the normalized query
+        String camelQuery = normalizeQuery(val);
+
+        StringBuilder options = new StringBuilder();
+        appendExistingOptions(camelCatalog, camelQuery, options,  wrapLength, json);
+        appendExtraOptions(camelCatalog, camelQuery, options,  wrapLength);
+
+        StringBuilder sb = createComponentDocumentation(wrapLength, val, json);
 
         if (options.length() > 0) {
             sb.append(options);
         }
         return sb.toString();
     }
+
 
     private boolean isPsiMethodCamelLanguage(PsiMethod method) {
         PsiType type = method.getReturnType();

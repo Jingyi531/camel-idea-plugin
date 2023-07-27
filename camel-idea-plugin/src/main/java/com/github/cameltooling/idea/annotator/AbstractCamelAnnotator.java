@@ -59,6 +59,31 @@ abstract class AbstractCamelAnnotator implements Annotator {
         }
     }
 
+    boolean acceptCheckType(PsiElement element) {
+        // skip whitespace noise
+        IElementType type = element.getNode().getElementType();
+        if (type == TokenType.WHITE_SPACE) {
+            return false;
+        }
+
+        // skip java doc noise
+        if (JavaDocElementType.ALL_JAVADOC_ELEMENTS.contains(type)) {
+            return false;
+        }
+        if (element instanceof YAMLKeyValue || element.getParent() instanceof YAMLKeyValue) {
+            return true;
+        }
+        boolean accept = false;
+
+        // we only want xml attributes or text value elements
+        if (element instanceof XmlElement) {
+            accept = type == XmlElementType.XML_ATTRIBUTE_VALUE
+                    || type == XmlElementType.XML_TEXT;
+        }
+        return accept;
+
+    }
+
     /**
      * To filter unwanted elements
      *
@@ -72,35 +97,15 @@ abstract class AbstractCamelAnnotator implements Annotator {
 
         if (element instanceof PsiPolyadicExpression) {
             return true;
-        } else {
-            final PsiPolyadicExpression parentOfType = PsiTreeUtil.getParentOfType(element, PsiPolyadicExpression.class);
-            if ((element instanceof PsiLiteralExpression || element instanceof PropertyValueImpl) && parentOfType == null) {
-                return true;
-            }
         }
-
-        // skip whitespace noise
-        IElementType type = element.getNode().getElementType();
-        if (type == TokenType.WHITE_SPACE) {
-            return false;
-        }
-
-        // skip java doc noise
-        if (JavaDocElementType.ALL_JAVADOC_ELEMENTS.contains(type)) {
-            return false;
-        } else if (element instanceof YAMLKeyValue || element.getParent() instanceof YAMLKeyValue) {
+        final PsiPolyadicExpression parentOfType = PsiTreeUtil.getParentOfType(element, PsiPolyadicExpression.class);
+        if ((element instanceof PsiLiteralExpression || element instanceof PropertyValueImpl) && parentOfType == null) {
             return true;
+
         }
 
-        boolean accept = false;
+        return acceptCheckType(element);
 
-        // we only want xml attributes or text value elements
-        if (element instanceof XmlElement) {
-            accept = type == XmlElementType.XML_ATTRIBUTE_VALUE
-                || type == XmlElementType.XML_TEXT;
-        }
-
-        return accept;
     }
 
     /**

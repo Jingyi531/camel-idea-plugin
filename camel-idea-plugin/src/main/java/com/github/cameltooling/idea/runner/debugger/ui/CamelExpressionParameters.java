@@ -16,7 +16,10 @@
  */
 package com.github.cameltooling.idea.runner.debugger.ui;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.xdebugger.XExpression;
+import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 
 import javax.swing.JPanel;
 
@@ -57,6 +60,27 @@ public class CamelExpressionParameters {
         resultTypeCombo = new ComboBox<>(new String[]{"java.lang.String", "java.lang.Boolean"});
         bodyMediaTypeCombo = new ComboBox<>(new String[]{"application/json", "application/xml", "application/csv", "application/x-java-object", "text/plain"});
         outputMediaTypeCombo = new ComboBox<>(new String[]{"application/json", "application/xml", "application/csv", "application/x-java-object", "text/plain"});
+    }
+
+    public CamelExpressionInputComponent helpCreateInputComponentInExpressionMode(Project myProject, XDebuggerEditorsProvider myEditorsProvider, XExpression text) {
+
+        CamelExpressionInputComponent component =
+                new CamelExpressionInputComponent(myProject, myEditorsProvider, "setValueExpression", null, text, false);
+        component.addExpressionParametersComponent(this.getMainPanel());
+        component.setResultTypeCombo(this.getResultTypeCombo());
+        component.setBodyMediaTypeCombo(this.getBodyMediaTypeCombo());
+        component.setOutputMediaTypeCombo(this.getOutputMediaTypeCombo());
+
+
+        component.getInputEditor().getLanguageChooser().addPropertyChangeListener(evt -> {
+            Object newValueObj = evt.getNewValue();
+            if (newValueObj != null) {
+                String newValue = evt.getNewValue().toString();
+                this.getBodyMediaTypePanel().setVisible("DataSonnet".equals(newValue));
+                this.getOutputMediaTypePanel().setVisible("DataSonnet".equals(newValue));
+            }
+        });
+        return component;
     }
 
 }

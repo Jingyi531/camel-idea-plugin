@@ -215,22 +215,9 @@ public class CamelSetValueDialog extends DialogWrapper {
     private EvaluationInputComponent createInputComponent(EvaluationMode mode, XExpression text) {
         text = XExpressionImpl.changeMode(text, mode);
         if (mode == EvaluationMode.EXPRESSION) {
-            CamelExpressionInputComponent component =
-                    new CamelExpressionInputComponent(myProject, myEditorsProvider, "setValueExpression", null, text, false);
-            component.addExpressionParametersComponent(myCamelExpressionParameters.getMainPanel());
-            component.setResultTypeCombo(myCamelExpressionParameters.getResultTypeCombo());
-            component.setBodyMediaTypeCombo(myCamelExpressionParameters.getBodyMediaTypeCombo());
-            component.setOutputMediaTypeCombo(myCamelExpressionParameters.getOutputMediaTypeCombo());
-
+            CamelExpressionInputComponent component = myCamelExpressionParameters.helpCreateInputComponentInExpressionMode(myProject, myEditorsProvider, text);
             component.getInputEditor().setExpandHandler(() -> mySwitchModeAction.actionPerformed(null));
-            component.getInputEditor().getLanguageChooser().addPropertyChangeListener(evt -> {
-                Object newValueObj = evt.getNewValue();
-                if (newValueObj != null) {
-                    String newValue = evt.getNewValue().toString();
-                    myCamelExpressionParameters.getBodyMediaTypePanel().setVisible("DataSonnet".equals(newValue));
-                    myCamelExpressionParameters.getOutputMediaTypePanel().setVisible("DataSonnet".equals(newValue));
-                }
-            });
+
             return component;
         } else {
             CodeFragmentInputComponent component = new CodeFragmentInputComponent(myProject, myEditorsProvider, null, text,

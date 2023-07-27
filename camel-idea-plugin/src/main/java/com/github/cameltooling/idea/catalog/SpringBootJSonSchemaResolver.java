@@ -202,24 +202,25 @@ class SpringBootJSonSchemaResolver implements JSonSchemaResolver {
      * Merge into one main Json schema all groups and properties whose name matches with the expectations
      * (see {@link #isNameToIgnore(String)} for more details). All duplicates are skipped.
      *
-     * @param allSpringConfigurationMetadata the content of all Spring configuration metadata that could be found in Camel
+     * @param configurationMetadata the content of all Spring configuration metadata that could be found in Camel
      *                                       libraries.
      * @return the content of a main Json schema corresponding to all groups and properties that could be found in the
      * given content of Spring configuration metadata, {@code null} if the given list is empty or the first Spring
      * configuration metadata corresponding to the main one cannot be parsed.
      */
-    private String toMainJsonSchema(final List<String> allSpringConfigurationMetadata) {
-        if (allSpringConfigurationMetadata.isEmpty()) {
+    private String toMainJsonSchema(final List<String> configurationMetadata) {
+        if (configurationMetadata.isEmpty()) {
             return null;
         }
         try {
-            final Iterator<String> allSpringConfigurationMetadataIterator = allSpringConfigurationMetadata.iterator();
-            final String mainSpringConfigurationMetadata = allSpringConfigurationMetadataIterator.next();
-            final JsonObject jsonObject = (JsonObject) Jsoner.deserialize(mainSpringConfigurationMetadata);
+            final Iterator<String> configurationMetadataIterator = configurationMetadata.iterator();
+            final String mainConfigurationMetadata = configurationMetadataIterator.next();
+            final JsonObject jsonObject = (JsonObject) Jsoner.deserialize(mainConfigurationMetadata);
+
             if (jsonObject == null) {
                 return null;
             }
-            final MainModel model = JsonMapper.generateMainModel(mainSpringConfigurationMetadata);
+            final MainModel model = JsonMapper.generateMainModel(mainConfigurationMetadata);
             final Set<String> existingGroups = new HashSet<>();
             for (Iterator<MainModel.MainGroupModel> iterator = model.getGroups().iterator(); iterator.hasNext();) {
                 final MainModel.MainGroupModel group = iterator.next();
@@ -253,9 +254,9 @@ class SpringBootJSonSchemaResolver implements JSonSchemaResolver {
                 option.setEnums(getEnums(option.getJavaType()));
             }
             // Add the rest of the Camel related main metadata
-            while (allSpringConfigurationMetadataIterator.hasNext()) {
+            while (configurationMetadataIterator.hasNext()) {
                 addSpringConfigurationMetadata(
-                    model, allSpringConfigurationMetadataIterator.next(), existingGroups, existingProperties
+                        model, configurationMetadataIterator.next(), existingGroups, existingProperties
                 );
             }
             return JsonMapper.createJsonSchema(model);

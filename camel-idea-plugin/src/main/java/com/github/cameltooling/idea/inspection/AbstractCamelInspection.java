@@ -23,6 +23,7 @@ import com.github.cameltooling.idea.annotator.CamelAnnotatorEndpointMessage;
 import com.github.cameltooling.idea.service.CamelCatalogService;
 import com.github.cameltooling.idea.service.CamelService;
 import com.github.cameltooling.idea.service.QueryUtils;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.github.cameltooling.idea.util.IdeaUtils;
 import com.github.cameltooling.idea.util.StringUtils;
@@ -200,9 +201,9 @@ public abstract class AbstractCamelInspection extends LocalInspectionTool {
         IElementType type = element.getNode().getElementType();
         LOG.trace("Element " + element + " of type: " + type + " to inspect endpoint uri: " + text);
 
-        final CamelIdeaUtils camelIdeaUtils = CamelIdeaUtils.getService();
+        final CamelIdeaEndpointUtil camelIdeaEndpointUtil = CamelIdeaEndpointUtil.getService();
         // skip special values such as configuring ActiveMQ brokerURL
-        if (camelIdeaUtils.skipEndpointValidation(element)) {
+        if (camelIdeaEndpointUtil.skipEndpointValidation(element)) {
             LOG.debug("Skipping element " + element + " for validation with text: " + text);
             return;
         }
@@ -216,7 +217,7 @@ public abstract class AbstractCamelInspection extends LocalInspectionTool {
             camelQuery = camelQuery.substring(0, camelQuery.length() - 1);
         }
 
-        boolean stringFormat = camelIdeaUtils.isFromStringFormatEndpoint(element);
+        boolean stringFormat = camelIdeaEndpointUtil.isFromStringFormatEndpoint(element);
         if (stringFormat) {
             // if the node is fromF or toF, then replace all %X with {{%X}} as we cannot parse that value
             camelQuery = camelQuery.replaceAll("%s", "\\{\\{\\%s\\}\\}");
@@ -224,8 +225,8 @@ public abstract class AbstractCamelInspection extends LocalInspectionTool {
             camelQuery = camelQuery.replaceAll("%b", "\\{\\{\\%b\\}\\}");
         }
 
-        boolean consumerOnly = camelIdeaUtils.isConsumerEndpoint(element);
-        boolean producerOnly = camelIdeaUtils.isProducerEndpoint(element);
+        boolean consumerOnly = camelIdeaEndpointUtil.isConsumerEndpoint(element);
+        boolean producerOnly = camelIdeaEndpointUtil.isProducerEndpoint(element);
 
         try {
             EndpointValidationResult result = catalogService.validateEndpointProperties(camelQuery, false, consumerOnly, producerOnly);

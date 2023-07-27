@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import com.github.cameltooling.idea.reference.endpoint.CamelEndpoint;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.TextRange;
@@ -48,7 +49,7 @@ public class DirectEndpointReference extends PsiPolyVariantReferenceBase<PsiElem
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         return Optional.ofNullable(ModuleUtilCore.findModuleForPsiElement(myElement))
-            .map(module -> CamelIdeaUtils.getService().findEndpointDeclarations(module, endpoint))
+            .map(module -> CamelIdeaEndpointUtil.getService().findEndpointDeclarations(module, endpoint))
             .map(this::wrapAsDirectEndpointPsiElements)
             .map(PsiElementResolveResult::createResults)
             .orElse(ResolveResult.EMPTY_ARRAY);

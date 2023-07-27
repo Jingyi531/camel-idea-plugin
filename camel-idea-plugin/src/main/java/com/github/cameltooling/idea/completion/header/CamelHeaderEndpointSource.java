@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.github.cameltooling.idea.util.StringUtils;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -37,7 +38,7 @@ public enum CamelHeaderEndpointSource {
     PRODUCER_ONLY {
         @Override
         Collection<CamelHeaderEndpoint> getEndpoints(@NotNull PsiElement element) {
-            final CamelIdeaUtils utils = CamelIdeaUtils.getService();
+            final CamelIdeaEndpointUtil utils = CamelIdeaEndpointUtil.getService();
             return utils.findEndpointUsages(
                 ModuleUtilCore.findModuleForPsiElement(element), e -> e.indexOf(':') != -1
             )
@@ -56,7 +57,7 @@ public enum CamelHeaderEndpointSource {
     CONSUMER_ONLY {
         @Override
         Collection<CamelHeaderEndpoint> getEndpoints(@NotNull PsiElement element) {
-            final CamelIdeaUtils utils = CamelIdeaUtils.getService();
+            final CamelIdeaEndpointUtil utils = CamelIdeaEndpointUtil.getService();
             return utils.findEndpointDeclarations(
                 ModuleUtilCore.findModuleForPsiElement(element), e -> e.indexOf(':') != -1
             )

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.cameltooling.idea.reference.endpoint.CamelEndpoint;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -37,7 +38,7 @@ public class CamelEndpointNameCompletionExtension extends SimpleCompletionExtens
     @Override
     protected List<LookupElement> findResults(@NotNull PsiElement element, @NotNull String query) {
         Module module = ModuleUtilCore.findModuleForPsiElement(element);
-        List<PsiElement> endpointDeclarations = CamelIdeaUtils.getService().findEndpointDeclarations(module, e -> true);
+        List<PsiElement> endpointDeclarations = CamelIdeaEndpointUtil.getService().findEndpointDeclarations(module, e -> true);
         return endpointDeclarations.stream()
             .map(this::createLookupElement)
             .collect(Collectors.toList());
@@ -56,7 +57,7 @@ public class CamelEndpointNameCompletionExtension extends SimpleCompletionExtens
             return false;
         }
         PsiElement element = parameters.getPosition();
-        CamelIdeaUtils service = CamelIdeaUtils.getService();
+        CamelIdeaEndpointUtil service = CamelIdeaEndpointUtil.getService();
         return service.isPlaceForEndpointUri(element)
             && service.isProducerEndpoint(element);
     }

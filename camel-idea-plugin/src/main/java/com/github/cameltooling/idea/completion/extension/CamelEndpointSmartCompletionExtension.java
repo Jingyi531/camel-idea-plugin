@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.cameltooling.idea.service.CamelCatalogService;
 import com.github.cameltooling.idea.service.CamelProjectPreferenceService;
 import com.github.cameltooling.idea.service.KameletService;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.github.cameltooling.idea.util.IdeaUtils;
 import com.github.cameltooling.idea.util.StringUtils;
@@ -138,7 +139,7 @@ public class CamelEndpointSmartCompletionExtension implements CamelCompletionExt
             LOG.warn("Error parsing Camel endpoint properties with url: " + queryAtPosition, e);
         }
         final ComponentModel componentModel = mode.componentModel(
-            project, camelCatalog, componentName, concatQuery, CamelIdeaUtils.getService().isConsumerEndpoint(element)
+            project, camelCatalog, componentName, concatQuery, CamelIdeaEndpointUtil.getService().isConsumerEndpoint(element)
         );
         if (componentModel == null) {
             return;

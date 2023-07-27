@@ -26,6 +26,7 @@ import javax.swing.*;
 import com.github.cameltooling.idea.service.CamelCatalogService;
 import com.github.cameltooling.idea.service.CamelPreferenceService;
 import com.github.cameltooling.idea.service.CamelService;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.github.cameltooling.idea.util.IdeaUtils;
 import com.intellij.codeInsight.intention.LowPriorityAction;
@@ -68,7 +69,7 @@ public class CamelAddEndpointIntention extends PsiElementBaseIntentionAction imp
         Set<String> artifacts = project.getService(CamelService.class).getLibraries();
 
         // find the camel component from those libraries
-        boolean consumerOnly = CamelIdeaUtils.getService().isConsumerEndpoint(element);
+        boolean consumerOnly = CamelIdeaEndpointUtil.getService().isConsumerEndpoint(element);
         List<String> names = findCamelComponentNamesInArtifact(artifacts, consumerOnly, project);
 
         // no camel endpoints then exit

@@ -17,6 +17,7 @@
 package com.github.cameltooling.idea.reference.endpoint;
 
 import com.github.cameltooling.idea.reference.CamelPsiReferenceProvider;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteralValue;
@@ -39,7 +40,7 @@ public abstract class CamelEndpointPsiReferenceProvider extends CamelPsiReferenc
         if (!isEndpoint(endpointUri)) {
             return PsiReference.EMPTY_ARRAY;
         }
-        if (!CamelIdeaUtils.getService().isPlaceForEndpointUri(element)) {
+        if (!CamelIdeaEndpointUtil.getService().isPlaceForEndpointUri(element)) {
             return PsiReference.EMPTY_ARRAY;
         }
         return getEndpointReferencesByElement(endpointUri, element, context);

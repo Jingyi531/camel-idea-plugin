@@ -26,6 +26,7 @@ import javax.swing.*;
 
 import com.github.cameltooling.idea.completion.OptionSuggestion;
 import com.github.cameltooling.idea.service.CamelPreferenceService;
+import com.github.cameltooling.idea.util.CamelIdeaEndpointUtil;
 import com.github.cameltooling.idea.util.CamelIdeaUtils;
 import com.github.cameltooling.idea.util.IdeaUtils;
 import com.github.cameltooling.idea.util.JavaClassUtils;
@@ -80,14 +81,15 @@ public final class CamelSmartCompletionEndpointOptions {
                 final String name = option.getName();
 
                 final CamelIdeaUtils camelIdeaUtils = CamelIdeaUtils.getService();
+                final CamelIdeaEndpointUtil camelIdeaEndpointUtil = CamelIdeaEndpointUtil.getService();
 
                 // if we are consumer only, then any option that has producer in the label should be skipped (as its only for producer)
-                final boolean consumerOnly = camelIdeaUtils.isConsumerEndpoint(element);
+                final boolean consumerOnly = camelIdeaEndpointUtil.isConsumerEndpoint(element);
                 if (consumerOnly && option.getLabel() != null && option.getLabel().contains("producer")) {
                     continue;
                 }
                 // if we are producer only, then any option that has consumer in the label should be skipped (as its only for consumer)
-                final boolean producerOnly = camelIdeaUtils.isProducerEndpoint(element);
+                final boolean producerOnly = camelIdeaEndpointUtil.isProducerEndpoint(element);
                 if (producerOnly && option.getLabel() != null && option.getLabel().contains("consumer")) {
                     continue;
                 }

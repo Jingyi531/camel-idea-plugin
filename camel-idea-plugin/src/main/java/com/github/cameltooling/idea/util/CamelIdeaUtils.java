@@ -121,40 +121,7 @@ public final class CamelIdeaUtils implements Disposable {
             .anyMatch(extension -> extension.isCamelExpressionUsedAsPredicate(element, language));
     }
 
-    /**
-     * Is the given element from a consumer endpoint used in a route from a <tt>from</tt>, <tt>fromF</tt>,
-     * <tt>interceptFrom</tt>, or <tt>pollEnrich</tt> pattern.
-     */
-    public boolean isConsumerEndpoint(PsiElement element) {
-        return enabledExtensions.stream()
-            .anyMatch(extension -> extension.isConsumerEndpoint(element));
-    }
 
-    /**
-     * Is the given element from a producer endpoint used in a route from a <tt>to</tt>, <tt>toF</tt>,
-     * <tt>interceptSendToEndpoint</tt>, <tt>wireTap</tt>, or <tt>enrich</tt> pattern.
-     */
-    public boolean isProducerEndpoint(PsiElement element) {
-        return enabledExtensions.stream()
-            .anyMatch(extension -> extension.isProducerEndpoint(element));
-    }
-
-    /**
-     * Could an endpoint uri be present at this location?
-     */
-    public boolean isPlaceForEndpointUri(PsiElement element) {
-        return enabledExtensions.stream()
-            .anyMatch(extension -> extension.isPlaceForEndpointUri(element));
-    }
-
-    /**
-     * Is the given element from a method call named <tt>fromF</tt> or <tt>toF</tt>, or <tt>String.format</tt> which supports the
-     * {@link String#format(String, Object...)} syntax and therefore we need special handling.
-     */
-    public boolean isFromStringFormatEndpoint(PsiElement element) {
-        return enabledExtensions.stream()
-            .anyMatch(extension -> extension.isFromStringFormatEndpoint(element));
-    }
 
     /**
      * Is the class a Camel expression class
@@ -191,13 +158,6 @@ public final class CamelIdeaUtils implements Disposable {
         return isCamelExpressionOrLanguage(clazz.getSuperClass());
     }
 
-    /**
-     * Certain elements should be skipped for endpoint validation such as ActiveMQ brokerURL property and others.
-     */
-    public boolean skipEndpointValidation(PsiElement element) {
-        return enabledExtensions.stream()
-            .anyMatch(extension -> extension.skipEndpointValidation(element));
-    }
 
     /**
      * Whether the element can be accepted for the annator or inspection.
@@ -240,28 +200,6 @@ public final class CamelIdeaUtils implements Disposable {
         final PsiClass[] interfaces = clazz.getSupers();
         return Arrays.stream(interfaces)
             .anyMatch(c -> "org.apache.camel.RoutesBuilder".equals(c.getQualifiedName()));
-    }
-
-    public List<PsiElement> findEndpointUsages(Module module, CamelEndpoint endpoint) {
-        return findEndpointUsages(module, endpoint::baseUriMatches);
-    }
-
-    public List<PsiElement> findEndpointUsages(Module module, Predicate<String> uriCondition) {
-        return enabledExtensions.stream()
-            .map(e -> e.findEndpointUsages(module, uriCondition))
-            .flatMap(List::stream)
-            .toList();
-    }
-
-    public List<PsiElement> findEndpointDeclarations(Module module, CamelEndpoint endpoint) {
-        return findEndpointDeclarations(module, endpoint::baseUriMatches);
-    }
-
-    public List<PsiElement> findEndpointDeclarations(Module module, Predicate<String> uriCondition) {
-        return enabledExtensions.stream()
-            .map(e -> e.findEndpointDeclarations(module, uriCondition))
-            .flatMap(List::stream)
-            .toList();
     }
 
 
